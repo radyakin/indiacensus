@@ -1,5 +1,5 @@
 	// -----------------------------------------------------------------
-	// 2019-07, Sergiy Radyakin, Senior Economist, The World Bank
+	// 2019-12, Sergiy Radyakin, Senior Economist, The World Bank
 	// India T23 from Census Data 
 	// Requires special data preparation as per the main program
 	// -----------------------------------------------------------------
@@ -11,9 +11,9 @@
 		foreach v in `vars' {
 			quietly summarize _freq if (`condition') & (`v'==1), meanonly
 			matrix M[`i',1]=r(sum)*`w'
-			quietly summarize _freq if (`condition') & (`v'==1 & Q03_SEX==1) , meanonly
+			quietly summarize _freq if (`condition') & (`v'==1 & q03_sex==1) , meanonly
 			matrix M[`i',2]=r(sum)*`w'
-			quietly summarize _freq if (`condition') & (`v'==1 & Q03_SEX==2), meanonly
+			quietly summarize _freq if (`condition') & (`v'==1 & q03_sex==2), meanonly
 			matrix M[`i',3]=r(sum)*`w'
 			local i=`i'+1
 		}
@@ -35,16 +35,16 @@
 	program define tabcolumn
 		syntax , subpop(string) result(string)
 		local rv "age1 age2 age3 age4 age5"
-		local over "Q09B_DIS_TYPE"
-		local subpop "((`subpop') & (Q09A_DIS_STATUS==1))"
+		local over "q09b_dis_type"
+		local subpop "((`subpop') & (q09a_dis_status==1))"
 		local cmd `"tabpanel, rowvars(`rv') over(`over')"'
 
 		tempname COL
 		`cmd' subpop(`subpop')
 		matrix `COL'=r(PANEL)
-		`cmd' subpop((`subpop') & (RU==1))
+		`cmd' subpop((`subpop') & (ru==1))
 		matrix `COL'=`COL' \ r(PANEL)
-		`cmd' subpop((`subpop') & (RU==2))
+		`cmd' subpop((`subpop') & (ru==2))
 		matrix `COL'=`COL' \ r(PANEL)
 		capture confirm matrix `result'
 		if _rc matrix `result'=`COL'
@@ -82,10 +82,10 @@
 		if (`"`condition'"'=="") local condition "1"
 
 		tabcolumn, result(`M') subpop((`condition'))
-		tabcolumn, result(`M') subpop((Q15_WORKER==1)&(`condition'))
-		tabcolumn, result(`M') subpop((Q15_WORKER==3)&(`condition'))
-		tabcolumn, result(`M') subpop((Q15_WORKER==2)&(`condition'))
-		tabcolumn, result(`M') subpop((Q15_WORKER==4)&(`condition'))
+		tabcolumn, result(`M') subpop((q15_worker==1)&(`condition'))
+		tabcolumn, result(`M') subpop((q15_worker==3)&(`condition'))
+		tabcolumn, result(`M') subpop((q15_worker==2)&(`condition'))
+		tabcolumn, result(`M') subpop((q15_worker==4)&(`condition'))
 		
 		quietly {
 			putexcel set `"`file'"', sheet(`"`sheet'"') modify
